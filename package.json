@@ -1,0 +1,22 @@
+{
+  "name": "webpack-practice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Samatar26/webpack.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Samatar26/webpack/issues"
+  },
+  "homepage": "https://github.com/Samatar26/webpack#readme",
+  "devDependencies": {
+    "webpack": "^3.6.0"
+  }
+}
