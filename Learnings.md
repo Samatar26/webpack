@@ -6,3 +6,11 @@ Webpack tries to require the file by default and read the properties that are ex
 The first and most important property that's required is _*entry*_. It's the first file in your _*dependency graph*_ or the first piece of code that kicks off your application.
 
 Another property that's required is _*output/output.filename*_. This tells webpack where to actually create and what the name of your bundle is going to be. When we run webpack now, a bundle gets created with your filename. If you take a look at the code you'll be surprised to see a lot of additional code on top of the module we've created. The purpose of this is to allow modules to be run in the browser. It's considered the _*webpack runtime/webpackBootstrap code*_.
+
+### Changing output of your bundle
+In most cases you're not going to want a bundle.js to be created in the root of your project, a special folder, namely a _*public*_, _*dist*_, _*build*_ folder. We can do this by adding a property called _*path*_ to our output configuration option. You can't use the relative path, the path property is always going to look for an absolute path. We can use the path module in the following two ways to create the absolute path:
+
+```js
+path.join(__dirname, "build")
+path.resolve("build")
+```
