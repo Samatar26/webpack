@@ -145,3 +145,85 @@ module.exports = {
 }
 
 ```
+ // Loader summary: Rules and loaders describe to webpack how to treat files, before they're added to the dependency graph on a per file basis and really allows any asset to be treated as a module in your graph.
+
+### Plugins
+A plugin can perform any of of the functionality that loaders can't. Loaders are constrained to only being able to perform transformations on a single file, just before it's added to the dependency graph. So if you want to apply changes to _*multiple files*_ or create _*bundles of css*_ or minify your code, you will have to rely on plugins to perform this functionality. There's tons of plugins that are built out of the box provided by webpack and a huge ecosystem of plugins that have already been created to help you out.
+
+
+
+```js
+class ExamplePlugin {
+  apply(compiler) {
+    compiler.plugin("run", (compiler, callback) => {
+      console.log('Webpack is Running');
+      callback();
+    })
+  }
+}
+
+module.exports = ExamplePlugin;
+
+```
+
+This example plugin is a class and it has an apply method. The apply method allows the plugin author to be able to hook into different lifecycle events of webpack and perform functionalities. Therefore when this plugin is used, it's going to console log a message, when webpack starts to run!
+
+### Using a plugin
+The first step is to create a plugins array in your configuration. The next step is to pull in the plugin from npm or wherever your plugin is. Because we now know that a plugin is a class, we can remember this by creating a new instance of it, ie `new ExamplePlugin`!!! We can also pass in any options if you need to, this is done through the constructor.
+
+```js
+const path = require('path')
+const ExamplePlugin = require('./ExamplePlugin')
+module.exports = {
+  entry: './src/index.js',
+
+  output: {
+    filename: 'bundle.js',
+    path: path.join(__dirname, './build'),
+  },
+
+  module: {
+    rules: [
+      {
+        test: /\.jpe?g$/,
+        use: 'file-loader',
+      },
+    ],
+  },
+
+  plugins: [new ExamplePlugin()],
+}
+```
+
+We can also add some of the custom plugins provided by webpack out of the box. So when you want to use a new plugin you add it to your file and pass a new reference to it.
+
+```js
+const path = require('path')
+const ExamplePlugin = require('./ExamplePlugin')
+const webpack = require('webpack')
+
+module.exports = {
+  entry: './src/index.js',
+
+  output: {
+    filename: 'bundle.js',
+    path: path.join(__dirname, './build'),
+  },
+
+  module: {
+    rules: [
+      {
+        test: /\.jpe?g$/,
+        use: 'file-loader',
+      },
+    ],
+  },
+
+  plugins: [
+    new ExamplePlugin(),
+    new webpack.optimize.UglifyJsPlugin(),
+    new webpack.ContextReplacementPlugin(),
+  ],
+}
+```
+
