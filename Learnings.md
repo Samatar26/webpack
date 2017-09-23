@@ -28,3 +28,22 @@ If we break the code by specifying a file which doesn't exist when importing `fo
 We have a file called `bar-cjs.js` and it's a `commonjs` module and we're exporting it in the same way as foo.
 
 You can add as many modules to your dependency graph by simply importing them into different files that lead to your entry point. This is the main principle of webpack in that everything is surrounded with the dependency graph and allows us to have incremental builds. Also allows us to use modules and lets them run in the browser.
+
+### Loaders and rules
+So we've talked about the first two properties: _*entry*_ and _*output*_. So we know how to tell webpack where to start and where to put the bundles and how we want to create them. We can use different types of features and other types of modules inside our application. The whole goal is to allow Webpack to manage every asset even if it's not bundled together.
+
+The way we go about doing this, is through our third core concept called _*loaders*_, it may not map directly to a configuration property, as you're actually defining _*module*_ and _*rules*_. You may be wondering what a loader is.
+
+In webpack we have a type of transform that takes a source and it makes some sort of transformation to it and then returns a new version of that source. Webpack leverages this concept by allowing any type of asset to be treated as a module, but in the end will be converted back to JavaScript, so webpack can add it to the dependency graph. There are 100 of different loaders for 100 of different use cases.
+
+```js
+
+const doSomething = require('do-something')
+
+module.exports = function (source) {
+  const newSource = doSomethingToSource(source)
+
+  return source
+}
+
+```
