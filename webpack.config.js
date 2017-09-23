@@ -7,6 +7,11 @@ module.exports = {
     path: path.join(__dirname, './build'),
   },
   module: {
-    rules: [],
+    rules: [
+      {
+        test: /\.jpe?g$/,
+        use: 'file-loader',
+      },
+    ],
   },
 }

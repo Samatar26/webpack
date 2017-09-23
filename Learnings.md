@@ -30,9 +30,9 @@ We have a file called `bar-cjs.js` and it's a `commonjs` module and we're export
 You can add as many modules to your dependency graph by simply importing them into different files that lead to your entry point. This is the main principle of webpack in that everything is surrounded with the dependency graph and allows us to have incremental builds. Also allows us to use modules and lets them run in the browser.
 
 ### Loaders and rules
-So we've talked about the first two properties: _*entry*_ and _*output*_. So we know how to tell webpack where to start and where to put the bundles and how we want to create them. We can use different types of features and other types of modules inside our application. The whole goal is to allow Webpack to manage every asset even if it's not bundled together.
+So we've talked about the first two properties: `entry` and `output`. So we know how to tell webpack where to start and where to put the bundles and how we want to create them. We can use different types of features and other types of modules inside our application. The whole goal is to allow Webpack to manage every asset even if it's not bundled together.
 
-The way we go about doing this, is through our third core concept called _*loaders*_, it may not map directly to a configuration property, as you're actually defining _*module*_ and _*rules*_. You may be wondering what a loader is.
+The way we go about doing this, is through our third core concept called `loaders`, it may not map directly to a configuration property, as you're actually defining `module` and `rules`. You may be wondering what a loader is.
 
 In webpack we have a type of transform that takes a source and it makes some sort of transformation to it and then returns a new version of that source. Webpack leverages this concept by allowing any type of asset to be treated as a module, but in the end will be converted back to JavaScript, so webpack can add it to the dependency graph. There are 100 of different loaders for 100 of different use cases.
 
@@ -44,6 +44,104 @@ module.exports = function (source) {
   const newSource = doSomethingToSource(source)
 
   return source
+}
+
+```
+
+I'm now going to go into why would you use a loader or a certain property for a specific scenario. So for all cases each ruleset is going to be an object and take two important properties that is required. The first one is `test`. Test tells webpack that when I come across a file, before it is going to be added to the dependency graph, match against this regex and perform a certain transform on it. And that transform is where loaders come into play. So a really common example is `babel-loader`. Any time you come across a JavaScript file in your application, you're going to be using babel-loader.
+
+
+So when you think of functional transforms, it makes sense to think that they can be chained together. Loaders functionally tranform themselves from left to right.
+
+If you had a `scss` file for example, you could add a `sass-loader` to the end of you loaders array, as you have the ability to compose these functional transforms on top of each other.
+You can not only apply a single loader to your ruleset, but also an array of multiple loaders.
+
+```js
+const path = require('path')
+
+module.exports = {
+  entry: './src/index.js',
+  output: {
+    filename: 'bundle.js',
+    path: path.join(__dirname, './build'),
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        use: 'some-loader'
+      },
+      {
+        test: /\.css$/,
+        use: 'style-loader',
+        use: 'css-loader' // Same as styleloader(cssloader(source))
+      }
+    ],
+  },
+}
+```
+
+### Setting loader options
+Loaders also have the ability to have different types of options passed in to them, based on different scenarios. A great example of this would be if we're trying to load a jpeg and have it added to our dependency graph. The most common use case would be to leverage a loader called `url-loader`. What url-loader does is that whenever webpack comes across, i.e. in a css file, css-loader will invoke any `reference` to a background-url or another image url or a font url as a `dependency`. Therefore images like a jpeg can be `captured` with url-loader and base64-inline its value inside css. This wouldn't be great to happen everytime, therefore url-loader allows you to provide an option that if it's over a certain limit to just emit the file to your output directory. In order to add the `limit` option, you have to define the loader as an object and an options key inside the object. You can either define your loaders as strings or objects, totally up to you!
+
+```js
+const path = require('path')
+
+module.exports = {
+  entry: './src/index.js',
+  output: {
+    filename: 'bundle.js',
+    path: path.join(__dirname, './build'),
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        use: 'some-loader'
+      },
+      {
+        test: /\.css$/,
+        use: 'style-loader',
+        use: 'css-loader' // Same as styleloader(cssloader(source))
+      },
+      {
+        test: /\.jpeg$/,
+        use: {loader: "url-loader", options: {
+          limit: 10000
+        }}
+      }
+    ],
+  },
+}
+
+
+```
+
+### Using our first loader
+How webpack works is that it's going to automatically resolve the string you provided as a node module in your node_modules folder. We have added an image into our `.src` folder and in our entry we are importing this image. When we run `npm run build`, we have 2 assets created, `bundle.js` and the image. What file loader does is that whenever it comes across an asset or a module, it automatically emits that file to disk. This is perfect, because when you're ie dealing with a large image, you would never want to inline it, but you do want webpack to manage it. Because you can do awesome things on top of it.
+
+`Image-webpack-loader` is an example of a loader that allows you to apply a bunch of different options and compression features to all of your images. This would be great as you can take all of your images and compressing them before your bundle is completed and you have CDN ready assets automatically available to you. The idea is that you want to have as many sources locally as possible, because loaders will allow you to maintain everything as part of the webpack dependency graph.
+
+![image](https://user-images.githubusercontent.com/22747985/30777267-d83d3fc2-a0ae-11e7-9f7c-5b633d0a874a.png)
+
+
+```js
+const path = require('path')
+
+module.exports = {
+  entry: './src/index.js',
+  output: {
+    filename: 'bundle.js',
+    path: path.join(__dirname, './build'),
+  },
+  module: {
+    rules: [
+      {
+        test: /\.jpe?g$/,
+        use: 'file-loader',
+      },
+    ],
+  },
 }
 
 ```
